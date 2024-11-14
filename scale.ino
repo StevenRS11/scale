@@ -16,49 +16,38 @@
 const int LOADCELL_DOUT_PIN = 8;
 const int LOADCELL_SCK_PIN = 9;
 
-volatile bool dataReady = false;
-
 HX711 scale;
 
 void setup() {
   Serial.begin(57600);
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
-  attachInterrupt(digitalPinToInterrupt(LOADCELL_DOUT_PIN), getForce, LOW);
 }
+
+bool hasInit = false;
 
 void loop() {
-  //if(dataReady)
-  {
-    test();
-  }
 
-}
-void getForce(){
-  
-}
+  if(hasInit){
+        Serial.println(scale.get_units(3));
 
-
-void test(){
-  if (scale.is_ready()) {
-    
-     
+  } else if (scale.is_ready()) {
     scale.set_scale();    
     Serial.println("Tare... remove any weights from the scale.");
-    delay(5);
+    delay(5000);
     scale.tare();
     Serial.println("Tare done...");
     Serial.print("Place a known weight on the scale...");
-    delay(5);
+    delay(5000);
     long reading = scale.get_units(10);
     Serial.print("Result: ");
     Serial.println(reading);
-  
+    hasInit=true;
   } 
   else {
     Serial.println("HX711 not found.");
+    delay(1000);
   }
-  //delay(1000);
-  
+ // delay(10);
 }
 
 //calibration factor will be the (reading)/(known weight)
